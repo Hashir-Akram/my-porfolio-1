@@ -1,0 +1,430 @@
+
+<style>
+:root{
+  --brand:#4f46e5;--brand-dark:#3730a3;--brand-light:#eef2ff;--brand-mid:#818cf8;
+  --success:#16a34a;--success-bg:#f0fdf4;--warning:#b45309;--warning-bg:#fffbeb;
+  --danger:#dc2626;--danger-bg:#fef2f2;--info:#0369a1;--info-bg:#f0f9ff;
+  --text-primary:#0f172a;--text-secondary:#475569;--text-muted:#94a3b8;
+  --surface:#fff;--surface-2:#f8fafc;--surface-3:#f1f5f9;
+  --border:#e2e8f0;--border-strong:#cbd5e1;
+  --radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-xl:20px;
+  --font:'Inter','Segoe UI',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:var(--font)}
+.page{background:var(--surface-2);padding:16px;min-height:700px}
+.back{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:var(--surface);color:var(--text-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:11px;font-weight:600;margin-bottom:14px;cursor:pointer;text-decoration:none}
+.back:hover{background:var(--brand-light);color:var(--brand);border-color:rgba(79,70,229,0.25)}
+.two-col{display:grid;grid-template-columns:1fr 260px;gap:14px}
+
+/* Main card */
+.main-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.06)}
+
+/* Module header */
+.mod-hdr{background:#0f172a;padding:18px 24px;position:relative;overflow:hidden}
+.mod-hdr::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(79,70,229,0.08) 1px,transparent 1px),linear-gradient(90deg,rgba(79,70,229,0.08) 1px,transparent 1px);background-size:32px 32px}
+.mod-hdr::after{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--brand)}
+.mod-inner{position:relative;z-index:2}
+.type-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(79,70,229,0.2);border:1px solid rgba(79,70,229,0.35);color:#818cf8;border-radius:4px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.mod-title{font-size:17px;font-weight:700;color:#f8fafc;margin-bottom:6px;line-height:1.25}
+.mod-meta{display:flex;gap:16px;flex-wrap:wrap}
+.mod-meta-item{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:500;color:#94a3b8}
+.mod-meta-item i{font-size:10px;color:#64748b}
+
+/* Video placeholder */
+.vid-ph{background:#0f172a;height:240px;display:flex;align-items:center;justify-content:center;flex-direction:column;position:relative;overflow:hidden}
+.vid-ph::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(79,70,229,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(79,70,229,0.06) 1px,transparent 1px);background-size:40px 40px}
+.vid-ph-inner{position:relative;z-index:2;text-align:center}
+.vid-icon-ring{width:72px;height:72px;background:rgba(79,70,229,0.12);border:1px solid rgba(79,70,229,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.vid-icon-ring i{font-size:28px;color:#818cf8}
+.vid-ph-title{color:#f1f5f9;font-size:15px;font-weight:700;margin-bottom:6px}
+.vid-ph-sub{color:#64748b;font-size:12px}
+
+/* Nav bar */
+.nav-bar{padding:14px 24px;background:var(--surface-2);border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:var(--brand);color:#fff;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;transition:background 0.15s}
+.btn:hover{background:var(--brand-dark)}
+.btn-ghost{background:var(--surface);color:var(--brand);border:1px solid var(--brand)}
+.btn-ghost:hover{background:var(--brand-light)}
+.btn-success{background:var(--success)}
+.btn-success:hover{background:#15803d}
+.btn-purple{background:#7c3aed}
+.btn-purple:hover{background:#6d28d9}
+.btn-disabled{background:var(--surface-3);color:var(--text-muted);border:1px solid var(--border);cursor:not-allowed}
+.btn-group{display:flex;gap:8px;flex-wrap:wrap}
+
+/* ── QUIZ SECTION ── */
+.quiz-box{padding:24px}
+.quiz-hdr{text-align:center;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.quiz-hdr h2{font-size:16px;font-weight:700;color:var(--text-primary);margin-bottom:4px}
+.quiz-hdr p{font-size:12px;color:var(--text-secondary)}
+.q-info{display:flex;justify-content:center;gap:28px;margin-top:12px}
+.q-info-item{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--text-secondary)}
+.q-info-item i{color:var(--brand)}
+.q-counter{text-align:center;font-size:11px;color:var(--text-muted);font-weight:600;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:14px}
+.q-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px}
+.q-num{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;background:var(--brand-light);color:var(--brand);border-radius:4px;font-weight:700;font-size:11px;margin-bottom:10px}
+.q-text{font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:14px;line-height:1.5}
+.choices{display:flex;flex-direction:column;gap:7px}
+.choice{display:flex;align-items:center;gap:9px;padding:10px 13px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:12px;color:var(--text-secondary);font-weight:500;transition:all 0.15s}
+.choice:hover{border-color:var(--brand);background:var(--brand-light);color:var(--brand)}
+.choice.selected{border-color:var(--brand);background:var(--brand-light);color:var(--brand);font-weight:600}
+.radio-circle{width:16px;height:16px;border:2px solid var(--border-strong);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.choice.selected .radio-circle{border-color:var(--brand);background:var(--brand)}
+.choice.selected .radio-circle::after{content:'';width:5px;height:5px;background:#fff;border-radius:50%}
+
+/* Dots */
+.dots{display:flex;justify-content:center;gap:5px;margin:16px 0 12px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--border-strong);cursor:pointer;transition:all 0.2s}
+.dot.active{background:var(--brand);width:20px;border-radius:4px}
+.dot.answered{background:var(--success)}
+.slider-nav{display:flex;justify-content:space-between;margin-top:14px;gap:8px}
+.snav{padding:7px 16px;background:var(--brand);color:#fff;border:none;border-radius:var(--radius-sm);font-size:11px;font-weight:600;cursor:pointer;transition:background 0.15s}
+.snav:hover{background:var(--brand-dark)}
+.snav:disabled{background:var(--surface-3);color:var(--text-muted);cursor:not-allowed}
+
+/* Quiz result */
+.q-result{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;text-align:center}
+.score-big{font-size:48px;font-weight:800;color:var(--brand);line-height:1;margin-bottom:8px}
+.score-msg{font-size:15px;font-weight:700;color:var(--text-primary);margin-bottom:20px}
+.result-row{display:flex;justify-content:center;gap:32px;padding-top:20px;border-top:1px solid var(--border);flex-wrap:wrap}
+.ritem .rnum{font-size:22px;font-weight:700;color:var(--brand);display:block}
+.ritem .rlbl{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
+
+/* ── ASSIGNMENT ── */
+.assign-box{padding:24px}
+.assign-hdr{background:var(--surface-2);border:1px solid var(--border);border-left:4px solid var(--brand);border-radius:0 var(--radius-md) var(--radius-md) 0;padding:16px 20px;margin-bottom:16px}
+.assign-hdr h2{font-size:15px;font-weight:700;color:var(--text-primary);margin-bottom:10px}
+.assign-meta{display:flex;gap:20px;flex-wrap:wrap}
+.ameta{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--text-secondary)}
+.ameta i{color:var(--brand)}
+.instr-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:18px 20px;margin-bottom:14px}
+.instr-title{font-size:11px;font-weight:700;color:var(--text-primary);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;gap:5px}
+.instr-title i{color:var(--brand)}
+.instr-text{font-size:13px;color:var(--text-secondary);line-height:1.7}
+.upload-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:18px 20px}
+.upl-area{border:2px dashed var(--border-strong);border-radius:var(--radius-md);padding:28px;text-align:center;background:var(--surface-2);cursor:pointer}
+.upl-area:hover{border-color:var(--brand);background:var(--brand-light)}
+.upl-icon{font-size:28px;color:var(--brand);margin-bottom:8px;opacity:0.7}
+.upl-txt{font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:3px}
+.upl-hint{font-size:11px;color:var(--text-muted)}
+
+/* ── NOTES & RESOURCES ── */
+.notes-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-top:14px}
+.tabs-row{display:flex;border-bottom:1px solid var(--border);background:var(--surface-2)}
+.tab-btn{flex:1;padding:12px;text-align:center;background:transparent;border:none;border-bottom:3px solid transparent;font-size:11px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:all 0.15s;letter-spacing:0.3px}
+.tab-btn.active{color:var(--brand);border-bottom-color:var(--brand)}
+.tab-body{padding:20px}
+.notes-area{border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;min-height:100px;font-size:13px;line-height:1.65;background:var(--surface-2);color:var(--text-primary);width:100%;resize:vertical;display:block;margin-bottom:10px}
+.notes-area:focus{outline:none;border-color:var(--brand)}
+.res-item{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:10px}
+.res-left{display:flex;align-items:center;gap:12px}
+.res-ico{width:36px;height:36px;background:var(--brand-light);color:var(--brand);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.res-title{font-size:13px;font-weight:600;color:var(--text-primary)}
+.res-sub{font-size:11px;color:var(--text-muted)}
+.dl-btn{padding:6px 14px;background:var(--brand);color:#fff;border:none;border-radius:var(--radius-sm);font-size:11px;font-weight:600;cursor:pointer}
+
+/* ── SIDEBAR ── */
+.sidebar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.06)}
+.sb-hdr{background:#0f172a;padding:16px 18px;position:relative;overflow:hidden}
+.sb-hdr::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(79,70,229,0.08) 1px,transparent 1px),linear-gradient(90deg,rgba(79,70,229,0.08) 1px,transparent 1px);background-size:32px 32px}
+.sb-hdr::after{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--brand)}
+.sb-hdr h3{color:#f1f5f9;font-size:11px;font-weight:700;margin-bottom:12px;position:relative;z-index:2;text-transform:uppercase;letter-spacing:0.5px}
+.prog-wrap{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:var(--radius-sm);padding:10px 12px;position:relative;z-index:2}
+.prog-bar{background:rgba(255,255,255,0.1);height:5px;border-radius:3px;overflow:hidden;margin-bottom:6px}
+.prog-fill{height:100%;background:#818cf8;border-radius:3px;transition:width 0.5s}
+.prog-txt{font-size:10px;font-weight:600;text-align:center;color:#94a3b8;letter-spacing:0.3px}
+
+.mod-list{}
+.mod-item{border-bottom:1px solid var(--border)}
+.mod-item:last-child{border-bottom:none}
+.mod-link{display:flex;align-items:center;gap:9px;padding:10px 14px;text-decoration:none;color:var(--text-secondary);transition:background 0.15s;font-size:12px}
+.mod-link:hover{background:var(--surface-2)}
+.mod-item.active .mod-link{background:var(--brand-light);border-left:3px solid var(--brand);color:var(--brand)}
+.mod-ico{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.mod-ico.lesson{background:var(--brand-light);color:var(--brand)}
+.mod-ico.quiz{background:var(--info-bg);color:var(--info)}
+.mod-ico.assign{background:#fdf4ff;color:#9333ea}
+.mod-ttl{font-weight:600;font-size:11px;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+.mod-dur{font-size:10px;color:var(--text-muted)}
+.mod-status{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;flex-shrink:0;margin-left:auto}
+.mod-status.done{background:var(--success);color:#fff}
+.mod-status.cur{background:var(--brand);color:#fff}
+.mod-status.lock{background:var(--surface-3);color:var(--text-muted);border:1px solid var(--border)}
+
+/* State toggle */
+.state-toggle{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.state-btn{padding:5px 12px;font-size:11px;font-weight:600;border:1px solid var(--border);border-radius:4px;background:var(--surface);color:var(--text-secondary);cursor:pointer;transition:all 0.15s}
+.state-btn.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+</style>
+
+<div class="page">
+
+  <a class="back" href="#"><i class="fas fa-arrow-left" style="font-size:10px"></i> Back to Course</a>
+
+  <!-- State switcher -->
+  <div class="state-toggle">
+    <button class="state-btn active" onclick="showState('lesson')">Video Lesson</button>
+    <button class="state-btn" onclick="showState('quiz')">Quiz</button>
+    <button class="state-btn" onclick="showState('result')">Quiz Result</button>
+    <button class="state-btn" onclick="showState('assignment')">Assignment</button>
+    <button class="state-btn" onclick="showState('coming')">Coming Soon</button>
+  </div>
+
+  <div class="two-col">
+
+    <!-- LEFT -->
+    <div>
+
+      <!-- ── LESSON STATE ── -->
+      <div id="state-lesson">
+        <div class="main-card">
+          <div class="mod-hdr">
+            <div class="mod-inner">
+              <div class="type-pill"><i class="fas fa-play-circle" style="font-size:9px"></i> Lesson</div>
+              <div class="mod-title">LangChain Architecture — Agents, Tools & Memory</div>
+              <div class="mod-meta">
+                <div class="mod-meta-item"><i class="fas fa-clock"></i> 42 min</div>
+                <div class="mod-meta-item"><i class="fas fa-book"></i> Master Agentic AI</div>
+                <div class="mod-meta-item" style="color:#5DCAA5"><i class="fas fa-check-circle" style="color:#5DCAA5"></i> Completed</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Video area -->
+          <div style="background:#000;height:240px;display:flex;align-items:center;justify-content:center;position:relative">
+            <div style="text-align:center;position:relative;z-index:2">
+              <div style="width:60px;height:60px;background:var(--brand);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;cursor:pointer">
+                <i class="fas fa-play" style="color:#fff;font-size:20px;margin-left:3px"></i>
+              </div>
+              <div style="color:#94a3b8;font-size:11px">Click to play video</div>
+            </div>
+          </div>
+
+          <!-- Nav bar -->
+          <div class="nav-bar">
+            <a href="#" class="btn btn-ghost"><i class="fas fa-chevron-left" style="font-size:10px"></i> Previous</a>
+            <div class="btn-group">
+              <button class="btn btn-success"><i class="fas fa-check" style="font-size:11px"></i> Mark as Complete</button>
+              <a href="#" class="btn"><i class="fas fa-chevron-right" style="font-size:10px"></i> Next</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notes & Resources -->
+        <div class="notes-card">
+          <div class="tabs-row">
+            <button class="tab-btn active"><i class="fas fa-sticky-note"></i> Notes</button>
+            <button class="tab-btn"><i class="fas fa-download"></i> Resources</button>
+          </div>
+          <div class="tab-body">
+            <div style="font-size:11px;font-weight:700;color:var(--text-primary);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px">My Notes</div>
+            <textarea class="notes-area" placeholder="Take notes while learning...">LangChain uses a chain-of-thought approach where each agent step is logged. Key components: LLM, Tools, Memory, Agent Executor.</textarea>
+            <div style="display:flex;gap:8px">
+              <button class="btn" style="font-size:11px;padding:7px 14px"><i class="fas fa-save"></i> Save</button>
+              <button class="btn btn-ghost" style="font-size:11px;padding:7px 14px"><i class="fas fa-trash"></i> Clear</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── QUIZ STATE ── -->
+      <div id="state-quiz" style="display:none">
+        <div class="main-card">
+          <div class="mod-hdr">
+            <div class="mod-inner">
+              <div class="type-pill"><i class="fas fa-question-circle" style="font-size:9px"></i> Quiz</div>
+              <div class="mod-title">Section 1 Knowledge Check</div>
+              <div class="mod-meta">
+                <div class="mod-meta-item"><i class="fas fa-list-ol"></i> 10 Questions</div>
+                <div class="mod-meta-item"><i class="fas fa-clock"></i> 20 min</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="quiz-box">
+            <div class="quiz-hdr">
+              <h2>Section 1: Foundations of Agentic AI</h2>
+              <p>Answer all questions to complete this quiz</p>
+              <div class="q-info">
+                <div class="q-info-item"><i class="fas fa-question-circle"></i> 10 Questions</div>
+                <div class="q-info-item"><i class="fas fa-clock"></i> 20 min</div>
+              </div>
+            </div>
+
+            <div class="q-counter">Question <strong>2</strong> of 10</div>
+
+            <div class="q-card">
+              <div class="q-num">2</div>
+              <div class="q-text">Which of the following best describes the role of a "tool" in a LangChain agent?</div>
+              <div class="choices">
+                <div class="choice"><div class="radio-circle"></div> A function that transforms raw text into embeddings</div>
+                <div class="choice selected"><div class="radio-circle"><span style="display:block;width:5px;height:5px;background:#fff;border-radius:50%"></span></div> A callable that allows the agent to interact with external systems</div>
+                <div class="choice"><div class="radio-circle"></div> A memory store that persists conversation history</div>
+                <div class="choice"><div class="radio-circle"></div> A prompt template used for chain-of-thought reasoning</div>
+              </div>
+            </div>
+
+            <div class="dots">
+              <div class="dot answered"></div>
+              <div class="dot active"></div>
+              <div class="dot"></div><div class="dot"></div>
+              <div class="dot"></div><div class="dot"></div>
+              <div class="dot"></div><div class="dot"></div>
+              <div class="dot"></div><div class="dot"></div>
+            </div>
+
+            <div class="slider-nav">
+              <button class="snav"><i class="fas fa-chevron-left"></i> Previous</button>
+              <button class="snav">Next <i class="fas fa-chevron-right"></i></button>
+            </div>
+          </div>
+
+          <div class="nav-bar">
+            <a href="#" class="btn btn-ghost"><i class="fas fa-chevron-left" style="font-size:10px"></i> Previous</a>
+            <button class="btn btn-purple"><i class="fas fa-paper-plane" style="font-size:10px"></i> Submit Quiz</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── QUIZ RESULT STATE ── -->
+      <div id="state-result" style="display:none">
+        <div class="main-card">
+          <div class="mod-hdr">
+            <div class="mod-inner">
+              <div class="type-pill"><i class="fas fa-question-circle" style="font-size:9px"></i> Quiz — Result</div>
+              <div class="mod-title">Section 1 Knowledge Check</div>
+            </div>
+          </div>
+          <div class="quiz-box">
+            <div class="q-result">
+              <div class="score-big">87%</div>
+              <div class="score-msg">Excellent Work!</div>
+              <p style="font-size:13px;color:var(--text-secondary)">You passed this quiz with a score above the passing threshold.</p>
+              <div style="margin-top:16px">
+                <button class="btn" style="background:#b45309;font-size:12px;padding:8px 16px"><i class="fas fa-redo"></i> Retake Quiz</button>
+              </div>
+              <div class="result-row">
+                <div class="ritem"><span class="rnum">87%</span><span class="rlbl">Your Score</span></div>
+                <div class="ritem"><span class="rnum">10</span><span class="rlbl">Questions</span></div>
+                <div class="ritem"><span class="rnum">Jun 9</span><span class="rlbl">Submitted</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="nav-bar">
+            <a href="#" class="btn btn-ghost"><i class="fas fa-chevron-left" style="font-size:10px"></i> Previous</a>
+            <a href="#" class="btn"><i class="fas fa-chevron-right" style="font-size:10px"></i> Next Module</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ASSIGNMENT STATE ── -->
+      <div id="state-assignment" style="display:none">
+        <div class="main-card">
+          <div class="mod-hdr">
+            <div class="mod-inner">
+              <div class="type-pill"><i class="fas fa-file-alt" style="font-size:9px"></i> Assignment</div>
+              <div class="mod-title">Build a RAG Pipeline — Practical Assignment</div>
+              <div class="mod-meta">
+                <div class="mod-meta-item"><i class="fas fa-calendar"></i> Due: Jun 30, 2025</div>
+                <div class="mod-meta-item"><i class="fas fa-clock"></i> 2h estimate</div>
+              </div>
+            </div>
+          </div>
+          <div class="assign-box">
+            <div class="assign-hdr">
+              <h2>Build a RAG Pipeline — Practical Assignment</h2>
+              <div class="assign-meta">
+                <div class="ameta"><i class="fas fa-calendar-alt"></i> Due: Jun 30, 2025</div>
+                <div class="ameta"><i class="fas fa-clock"></i> 2h estimate</div>
+              </div>
+            </div>
+            <div class="instr-card">
+              <div class="instr-title"><i class="fas fa-info-circle"></i> Instructions</div>
+              <div class="instr-text">Build a working RAG (Retrieval-Augmented Generation) pipeline using LangChain and a vector database of your choice. Your pipeline should accept a PDF document, chunk it, embed it, store it, and answer questions from it with citations. Submit your GitHub repository link or a ZIP of your project files.</div>
+            </div>
+            <div class="upload-card">
+              <div style="font-size:11px;font-weight:700;color:var(--text-primary);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px">Submit Your Work</div>
+              <div class="upl-area">
+                <div class="upl-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                <div class="upl-txt">Drag & drop your file here</div>
+                <div class="upl-hint">or click to browse — PDF, ZIP, DOC (max 10 MB)</div>
+              </div>
+              <div style="margin-top:10px">
+                <label style="font-size:12px;font-weight:600;color:var(--text-primary);display:block;margin-bottom:6px">Or write your submission</label>
+                <textarea style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;font-size:13px;width:100%;resize:vertical;min-height:80px;background:var(--surface-2);color:var(--text-primary)" placeholder="Paste your GitHub link or describe your solution..."></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="nav-bar">
+            <a href="#" class="btn btn-ghost"><i class="fas fa-chevron-left" style="font-size:10px"></i> Previous</a>
+            <button class="btn btn-purple"><i class="fas fa-paper-plane" style="font-size:10px"></i> Submit Assignment</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── COMING SOON STATE ── -->
+      <div id="state-coming" style="display:none">
+        <div class="main-card">
+          <div class="mod-hdr">
+            <div class="mod-inner">
+              <div class="type-pill"><i class="fas fa-clock" style="font-size:9px"></i> Coming Soon</div>
+              <div class="mod-title">Advanced Multi-Agent Orchestration</div>
+            </div>
+          </div>
+          <div style="background:#0f172a;height:240px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden">
+            <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(79,70,229,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(79,70,229,0.06) 1px,transparent 1px);background-size:40px 40px"></div>
+            <div style="text-align:center;position:relative;z-index:2">
+              <div style="width:72px;height:72px;background:rgba(79,70,229,0.12);border:1px solid rgba(79,70,229,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px">
+                <i class="fas fa-clock" style="font-size:28px;color:#818cf8"></i>
+              </div>
+              <div style="color:#f1f5f9;font-size:15px;font-weight:700;margin-bottom:6px">Content Coming Soon</div>
+              <div style="color:#64748b;font-size:12px;margin-bottom:16px">This lesson is being prepared. Check back soon.</div>
+              <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(79,70,229,0.12);border:1px solid rgba(79,70,229,0.25);padding:8px 18px;border-radius:4px;font-size:12px;font-weight:600;color:#818cf8">
+                <i class="fas fa-hourglass-half"></i> In Development
+              </div>
+            </div>
+          </div>
+          <div class="nav-bar">
+            <a href="#" class="btn btn-ghost"><i class="fas fa-chevron-left" style="font-size:10px"></i> Previous</a>
+            <a href="#" class="btn btn-disabled" style="pointer-events:none">Next <i class="fas fa-chevron-right" style="font-size:10px"></i></a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sb-hdr">
+        <h3>Course Content</h3>
+        <div class="prog-wrap">
+          <div class="prog-bar"><div class="prog-fill" style="width:42%"></div></div>
+          <div class="prog-txt">42% Complete</div>
+        </div>
+      </div>
+      <div class="mod-list">
+        <div class="mod-item">
+          <a href="#" class="mod-link">
+            <div class="mod-ico lesson"><i class="fas fa-play" style="font-size:10px"></i></div>
+            <div style="flex:1;min-width:0">
+              <div class="mod-ttl">What is Agentic AI?</div>
+              <div class="mod-dur">28 min</div>
+            </div>
+            <div class="mod-status done"><i class="fas fa-check" style="font-size:8px"></i></div>
+          </a>
+        </div>
+        <div class="mod-item active">
+          <a href="#" class="mod-link">
+            <div class="mod-ico lesson"><i class="fas fa-play" style="font-size:10px"></i></div>
+            <div style="flex:1;min-width:0">
+              <div class="mod-ttl">LangChain Architecture</div>
+              <div class="mod-dur">42 min</div>
+            </div>
+            <div class="mod-status cur"><i class="fas fa-circle" style="font-size:6px"></i></div>
+          </a>
+        </div>
+        <div class="mod-item">
+          <a href="#" class="mod-link">
+            <div class="mod-ico quiz"><i class="fas fa-question" style="font-size:10px"></i></div>
+            <div style="flex:1;min-width:0">
+              <div class="mod-ttl">Section 

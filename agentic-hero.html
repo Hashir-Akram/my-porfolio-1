@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Agentic AI — Hero Section</title>
+<style>
+  /* ── Reset ── */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; background: #1e1b4b; font-family: 'Segoe UI', sans-serif; }
+
+  /* ── Hero wrapper ── */
+  #hero {
+    width: 100%;
+    min-height: 100vh;
+    background: #1e1b4b;
+    position: relative;
+    overflow: hidden;
+    cursor: none;
+  }
+
+  /* ── Particle canvas ── */
+  #cv { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; }
+
+  /* ── Custom cursor ── */
+  #cursor {
+    position: absolute;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: #7F77DD;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    z-index: 30;
+    transition: opacity 0.2s, width 0.15s, height 0.15s;
+  }
+
+  /* ── Top bar ── */
+  #topbar {
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 44px;
+    background: rgba(10, 8, 36, 0.92);
+    border-bottom: 1px solid rgba(127,119,221,0.2);
+    display: flex; align-items: center;
+    padding: 0 20px; gap: 14px;
+    z-index: 10;
+  }
+  .tb-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .tb-logo { font-size: 12px; font-weight: 700; color: #fff; letter-spacing: 1.5px; }
+  .tb-sep { width: 1px; height: 16px; background: rgba(127,119,221,0.2); }
+  .tb-status { font-size: 10px; color: #5DCAA5; letter-spacing: 1px; }
+  .tb-tag { font-size: 10px; color: #534AB7; letter-spacing: 1px; }
+  #tb-time { margin-left: auto; font-size: 10px; color: #534AB7; font-family: 'Courier New', monospace; }
+
+  /* ── Left agent panel ── */
+  #left-panel {
+    position: absolute; top: 44px; left: 0; bottom: 110px;
+    width: 210px;
+    background: rgba(10, 8, 36, 0.88);
+    border-right: 1px solid rgba(127,119,221,0.12);
+    padding: 12px 0;
+    z-index: 10; overflow: hidden;
+  }
+
+  /* ── Right metrics panel ── */
+  #right-panel {
+    position: absolute; top: 44px; right: 0; bottom: 110px;
+    width: 195px;
+    background: rgba(10, 8, 36, 0.88);
+    border-left: 1px solid rgba(127,119,221,0.12);
+    padding: 12px 0;
+    z-index: 10; overflow: hidden;
+  }
+
+  /* ── Bottom log ── */
+  #log-bar {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 110px;
+    background: rgba(5, 4, 22, 0.96);
+    border-top: 1px solid rgba(127,119,221,0.2);
+    padding: 8px 16px;
+    z-index: 10; overflow: hidden;
+  }
+  #log-inner { display: flex; flex-direction: column-reverse; height: 82px; overflow: hidden; }
+  .log-line {
+    font-size: 10px; font-family: 'Courier New', monospace;
+    line-height: 1.75; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+    opacity: 0; animation: fadein 0.4s forwards;
+  }
+  @keyframes fadein { to { opacity: 1; } }
+  .log-ts { color: #3C3489; }
+  .log-msg { color: #7875aa; }
+
+  /* ── Panel shared ── */
+  .panel-title {
+    font-size: 9px; letter-spacing: 2px; color: #534AB7;
+    padding: 0 14px 8px; text-transform: uppercase; font-family: sans-serif;
+  }
+  .agent-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 5px 12px; transition: background 0.3s;
+  }
+  .agent-row.active { background: rgba(127,119,221,0.07); }
+  .agent-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .agent-name { font-size: 10px; color: #AFA9EC; font-family: sans-serif; flex: 1; }
+  .agent-task { font-size: 9px; color: #534AB7; font-family: sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px; }
+  .agent-pct { font-size: 10px; color: #7F77DD; font-family: 'Courier New', monospace; min-width: 30px; text-align: right; }
+  .mini-bar { height: 3px; border-radius: 2px; background: rgba(127,119,221,0.12); overflow: hidden; margin-top: 3px; }
+  .mini-fill { height: 100%; border-radius: 2px; transition: width 0.7s ease; }
+
+  .metric-block { padding: 7px 14px 10px; border-bottom: 1px solid rgba(127,119,221,0.08); }
+  .metric-label { font-size: 9px; color: #534AB7; letter-spacing: 1px; font-family: sans-serif; text-transform: uppercase; margin-bottom: 2px; }
+  .metric-val { font-size: 20px; font-weight: 700; font-family: 'Courier New', monospace; }
+  .metric-sub { font-size: 9px; font-family: sans-serif; margin-top: 1px; }
+
+  /* ── Center hero text ── */
+  #center {
+    position: absolute; top: 44px; left: 210px; right: 195px; bottom: 110px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 5; pointer-events: none; padding: 0 24px;
+  }
+  #hl-badge {
+    font-size: 9px; letter-spacing: 3px; color: #7F77DD;
+    text-transform: uppercase; margin-bottom: 14px; font-family: sans-serif;
+    opacity: 0; transition: opacity 1s;
+  }
+  #hl-text {
+    font-size: clamp(20px, 3.5vw, 38px); font-weight: 800;
+    color: #fff; line-height: 1.2; text-align: center; min-height: 90px;
+    font-family: sans-serif;
+  }
+  #hl-sub {
+    font-size: 12px; color: #7875aa; text-align: center;
+    margin-top: 12px; line-height: 1.7; font-family: sans-serif;
+    opacity: 0; transition: opacity 1s;
+  }
+  #hl-cta {
+    margin-top: 20px; opacity: 0; transition: opacity 1s; pointer-events: all;
+  }
+  #hl-cta button {
+    background: #E85D30; color: #fff; border: none;
+    padding: 12px 32px; border-radius: 28px;
+    font-size: 13px; font-weight: 700; cursor: pointer;
+    font-family: sans-serif; letter-spacing: 0.5px;
+    transition: transform 0.15s, background 0.2s;
+  }
+  #hl-cta button:hover { background: #ff6b3a; transform: scale(1.06); }
+
+  /* ── Workflow pipeline ── */
+  #wf-bar {
+    position: absolute;
+    bottom: 118px; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 0;
+    z-index: 6; pointer-events: none;
+    opacity: 0; transition: opacity 1s;
+    white-space: nowrap;
+  }
+  .wf-node {
+    background: rgba(10,8,36,0.9);
+    border: 1px solid rgba(127,119,221,0.25);
+    border-radius: 8px; padding: 5px 11px;
+    text-align: center; min-width: 70px;
+  }
+  .wf-title { font-size: 9px; font-family: sans-serif; font-weight: 700; color: #fff; }
+  .wf-sub   { font-size: 8px; font-family: sans-serif; color: #534AB7; margin-top: 1px; }
+  .wf-node.done    { border-color: #5DCAA5; background: rgba(4,52,44,0.45); }
+  .wf-node.running { border-color: #EF9F27; background: rgba(65,36,2,0.45); animation: wfpulse 1s infinite alternate; }
+  .wf-node.idle    { border-color: rgba(127,119,221,0.18); }
+  @keyframes wfpulse { from { border-color: #EF9F27; } to { border-color: #fac775; } }
+  .wf-arr { font-size: 14px; color: #3C3489; padding: 0 3px; line-height: 1; }
+
+  /* ── Scroll indicator ── */
+  #scroll-hint {
+    position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+    opacity: 0; transition: opacity 1s; pointer-events: none; z-index: 6;
+  }
+  #scroll-hint span { font-size: 9px; letter-spacing: 2px; color: #534AB7; font-family: sans-serif; text-transform: uppercase; }
+  .s-arr { width: 1px; height: 14px; background: #534AB7; animation: sarr 1.4s infinite; }
+  .s-arr:nth-child(3) { animation-delay: 0.2s; opacity: 0.6; }
+  .s-arr:nth-child(4) { animation-delay: 0.4s; opacity: 0.3; }
+  @keyframes sarr { 0%,100%{opacity:1;transform:scaleY(1)} 50%{opacity:0.3;transform:scaleY(1.5)} }
+</style>
+</head>
+<body>
+
+<div id="hero">
+  <canvas id="cv"></canvas>
+  <div id="cursor"></div>
+
+  <!-- TOP BAR -->
+  <div id="topbar">
+    <div class="tb-dot" style="background:#E85D30"></div>
+    <div class="tb-dot" style="background:#EF9F27"></div>
+    <div class="tb-dot" style="background:#5DCAA5"></div>
+    <div class="tb-logo">AGENTIC&nbsp;OS</div>
+    <div class="tb-sep"></div>
+    <div class="tb-status">● SYSTEM LIVE</div>
+    <div class="tb-sep"></div>
+    <div class="tb-tag">6 AGENTS ACTIVE</div>
+    <div id="tb-time">00:00:00</div>
+  </div>
+
+  <!-- LEFT PANEL -->
+  <div id="left-panel">
+    <div class="panel-title">Agent Monitor</div>
+    <div id="agent-list"></div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div id="right-panel">
+    <div class="panel-title">Live Metrics</div>
+    <div class="metric-block">
+      <div class="metric-label">Tasks / min</div>
+      <div class="metric-val" id="m-tpm" style="color:#5DCAA5">0</div>
+      <div class="metric-sub" style="color:#1D9E75">▲ throughput</div>
+    </div>
+    <div class="metric-block">
+      <div class="metric-label">Accuracy</div>
+      <div class="metric-val" id="m-acc" style="color:#7F77DD;font-size:18px">0%</div>
+      <div class="mini-bar"><div class="mini-fill" id="acc-bar" style="background:#7F77DD;width:0%"></div></div>
+    </div>
+    <div class="metric-block">
+      <div class="metric-label">Latency</div>
+      <div class="metric-val" id="m-lat" style="color:#EF9F27;font-size:18px">0ms</div>
+      <div class="metric-sub" style="color:#854F0B">avg response</div>
+    </div>
+    <div class="metric-block">
+      <div class="metric-label">Uptime</div>
+      <div class="metric-val" id="m-upt" style="color:#5DCAA5;font-size:16px">00:00</div>
+      <div class="mini-bar"><div class="mini-fill" id="upt-bar" style="background:#5DCAA5;width:0%"></div></div>
+    </div>
+    <div style="padding:8px 14px">
+      <div class="metric-label" style="margin-bottom:6px">Pipeline health</div>
+      <div id="health-bars"></div>
+    </div>
+  </div>
+
+  <!-- CENTER HERO -->
+  <div id="center">
+    <div id="hl-badge">Build the skills companies will hire for next</div>
+    <div id="hl-text"></div>
+    <div id="hl-sub">
+      Learn Agentic AI · AI Engineering · Autonomous Systems · FDE<br>
+      Through live projects, workshops &amp; visual cheat sheets
+    </div>
+    <div id="hl-cta">
+      <!-- Wire this button to your CTA / enroll page -->
+      <button onclick="window.location.href='#enroll'">Start Your Journey &rarr;</button>
+    </div>
+  </div>
+
+  <!-- WORKFLOW PIPELINE -->
+  <div id="wf-bar">
+    <div class="wf-node done"    id="wf0"><div class="wf-title">Ingest</div><div class="wf-sub" id="ws0">✓ done</div></div>
+    <div class="wf-arr">→</div>
+    <div class="wf-node done"    id="wf1"><div class="wf-title">Parse</div><div class="wf-sub"  id="ws1">✓ done</div></div>
+    <div class="wf-arr">→</div>
+    <div class="wf-node running" id="wf2"><div class="wf-title">Reason</div><div class="wf-sub" id="ws2">thinking…</div></div>
+    <div class="wf-arr">→</div>
+    <div class="wf-node idle"    id="wf3"><div class="wf-title">Act</div><div class="wf-sub"    id="ws3">waiting</div></div>
+    <div class="wf-arr">→</div>
+    <div class="wf-node idle"    id="wf4"><div class="wf-title">Verify</div><div class="wf-sub" id="ws4">waiting</div></div>
+    <div class="wf-arr">→</div>
+    <div class="wf-node idle"    id="wf5"><div class="wf-title">Deploy</div><div class="wf-sub" id="ws5">waiting</div></div>
+  </div>
+
+  <!-- SCROLL HINT -->
+  <div id="scroll-hint">
+    <span>Scroll</span>
+    <div class="s-arr"></div>
+    <div class="s-arr"></div>
+    <div class="s-arr"></div>
+  </div>
+
+  <!-- BOTTOM LOG -->
+  <div id="log-bar">
+    <div class="panel-title" style="padding:0 0 4px">Live Agent Log</div>
+    <div id="log-inner"></div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   CANVAS + PARTICLE NEURAL FIELD
+═══════════════════════════════════════════ */
+const hero   = document.getElementById('hero');
+const cv     = document.getElementById('cv');
+const ctx    = cv.getContext('2d');
+const cursorEl = document.getElementById('cursor');
+let W, H, animT = 0;
+const mouse  = { x: -999, y: -999 };
+
+function resize() { W = cv.width = hero.clientWidth; H = cv.height = hero.clientHeight; }
+resize();
+window.addEventListener('resize', resize);
+
+hero.addEventListener('mousemove', e => {
+  const r = hero.getBoundingClientRect();
+  mouse.x = e.clientX - r.left;
+  mouse.y = e.clientY - r.top;
+  cursorEl.style.left  = mouse.x + 'px';
+  cursorEl.style.top   = mouse.y + 'px';
+});
+hero.addEventListener('mouseenter', () => cursorEl.style.opacity = '0.75');
+hero.addEventListener('mouseleave', () => { mouse.x = -999; mouse.y = -999; cursorEl.style.opacity = '0'; });
+
+const PCOLS = ['#7F77DD','#5DCAA5','#E85D30','#378ADD','#EF9F27','#ED93B1','#97C459'];
+const particles = Array.from({length: 160}, () => ({
+  x: Math.random() * 1400, y: Math.random() * 900,
+  vx: (Math.random() - .5) * .32, vy: (Math.random() - .5) * .32,
+  r: 1.2 + Math.random() * 1.8,
+  color: PCOLS[Math.floor(Math.random() * PCOLS.length)],
+  alpha: .2 + Math.random() * .35,
+  phase: Math.random() * Math.PI * 2
+}));
+
+function hexRGB(h) {
+  return [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)];
+}
+
+function drawParticles() {
+  ctx.fillStyle = '#1e1b4b';
+  ctx.fillRect(0, 0, W, H);
+  const LINK = 100;
+  for (let i = 0; i < particles.length; i++) {
+    const a = particles[i];
+    const dxm = a.x - mouse.x, dym = a.y - mouse.y;
+    const dm  = Math.sqrt(dxm*dxm + dym*dym);
+    if (dm < 110) { const f = (110-dm)/110*.55; a.vx += dxm/dm*f; a.vy += dym/dm*f; }
+    a.vx *= .96; a.vy *= .96;
+    a.x  += a.vx; a.y += a.vy;
+    if (a.x < 0) a.x = W; if (a.x > W) a.x = 0;
+    if (a.y < 0) a.y = H; if (a.y > H) a.y = 0;
+    for (let j = i+1; j < particles.length; j++) {
+      const b = particles[j];
+      const dx = a.x-b.x, dy = a.y-b.y, d = Math.sqrt(dx*dx+dy*dy);
+      if (d < LINK) {
+        const [r,g,bl] = hexRGB(a.color);
+        ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
+        ctx.strokeStyle = `rgba(${r},${g},${bl},${(1-d/LINK)*.13})`;
+        ctx.lineWidth = .55; ctx.stroke();
+      }
+    }
+    const pulse = .85 + .15*Math.sin(animT*.03 + a.phase);
+    const [r,g,b] = hexRGB(a.color);
+    ctx.beginPath();
+    ctx.arc(a.x, a.y, a.r*pulse, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(${r},${g},${b},${a.alpha*pulse})`;
+    ctx.fill();
+  }
+  animT++;
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+/* ═══════════════════════════════════════════
+   AGENTS
+═══════════════════════════════════════════ */
+const AGENTS = [
+  { name:'PlannerAgent',   color:'#7F77DD', tasks:['Decomposing task','Building plan','Routing subtasks','Optimizing path'], pct:0 },
+  { name:'ResearchAgent',  color:'#5DCAA5', tasks:['Querying corpus','Fetching context','Ranking results','Summarizing'], pct:0 },
+  { name:'CoderAgent',     color:'#378ADD', tasks:['Generating code','Running tests','Fixing lint','Reviewing PR'], pct:0 },
+  { name:'MonitorAgent',   color:'#EF9F27', tasks:['Checking health','Logging metrics','Alerting drift','Sampling perf'], pct:0 },
+  { name:'VerifierAgent',  color:'#ED93B1', tasks:['Validating output','Scoring quality','Flagging errors','Approving'], pct:0 },
+  { name:'DeployAgent',    color:'#97C459', tasks:['Building image','Pushing artifact','Rolling deploy','Health check'], pct:0 },
+];
+
+const agentList = document.getElementById('agent-list');
+AGENTS.forEach((ag, i) => {
+  const row = document.createElement('div');
+  row.className = 'agent-row'; row.id = 'ag-' + i;
+  row.innerHTML = `
+    <div class="agent-dot" id="ind-${i}" style="background:${ag.color}"></div>
+    <div style="flex:1;overflow:hidden">
+      <div class="agent-name">${ag.name}</div>
+      <div class="agent-task" id="task-${i}">${ag.tasks[0]}</div>
+      <div class="mini-bar"><div class="mini-fill" id="bar-${i}" style="background:${ag.color};width:0%"></div></div>
+    </div>
+    <div class="agent-pct" id="pct-${i}">0%</div>`;
+  agentList.appendChild(row);
+});
+
+/* ═══════════════════════════════════════════
+   HEALTH BARS
+═══════════════════════════════════════════ */
+const HPIPES = [
+  { l:'RAG Pipeline', c:'#7F77DD' },
+  { l:'Tool Calls',   c:'#5DCAA5' },
+  { l:'Memory',       c:'#378ADD' },
+];
+const hbContainer = document.getElementById('health-bars');
+HPIPES.forEach(h => {
+  const id = h.l.replace(/\s/g,'');
+  const d  = document.createElement('div');
+  d.style.marginBottom = '6px';
+  d.innerHTML = `
+    <div style="display:flex;justify-content:space-between;margin-bottom:2px">
+      <span style="font-size:9px;color:#534AB7;font-family:sans-serif">${h.l}</span>
+      <span style="font-size:9px;font-family:'Courier New',monospace;color:${h.c}" id="hp-${id}">0%</span>
+    </div>
+    <div class="mini-bar"><div class="mini-fill" style="background:${h.c};width:0%" id="hb-${id}"></div></div>`;
+  hbContainer.appendChild(d);
+});
+
+/* ═══════════════════════════════════════════
+   LOG MESSAGES
+═══════════════════════════════════════════ */
+const LOG_MSGS = [
+  ag => `${ag.name} completed subtask in ${(Math.random()*700+120).toFixed(0)}ms`,
+  ag => `${ag.name} called tool:memory_search(k=5)`,
+  ag => `${ag.name} received ${Math.floor(Math.random()*5+2)} results · confidence 0.${Math.floor(Math.random()*15+82)}`,
+  ag => `${ag.name} → routing result to next agent`,
+  ()  => `MonitorAgent ● latency spike: ${(Math.random()*180+80).toFixed(0)}ms → resolved`,
+  ()  => `DeployAgent ● artifact pushed · sha:${Math.random().toString(36).slice(2,8)}`,
+  ()  => `PlannerAgent ● new subtask queued: analyze_embedding_drift`,
+  ()  => `VerifierAgent ● output score: ${(Math.random()*.12+.86).toFixed(3)} ✓`,
+  ()  => `ResearchAgent ● corpus hit: "agentic_systems_v2.pdf" chunk ${Math.floor(Math.random()*40+1)}`,
+  ()  => `CoderAgent ● tests passed 12/12 · coverage 94%`,
+];
+
+const LOG_COL = { Planner:'#7F77DD', Research:'#5DCAA5', Coder:'#378ADD', Monitor:'#EF9F27', Verifier:'#ED93B1', Deploy:'#97C459' };
+const logInner = document.getElementById('log-inner');
+
+function addLog(ag, msg) {
+  while (logInner.children.length > 20) logInner.removeChild(logInner.lastChild);
+  const now = new Date();
+  const ts  = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}.${String(now.getMilliseconds()).slice(0,2)}`;
+  const key = Object.keys(LOG_COL).find(k => ag.name.startsWith(k)) || 'Planner';
+  const col = LOG_COL[key];
+  const el  = document.createElement('div');
+  el.className = 'log-line';
+  el.innerHTML = `<span class="log-ts">[${ts}]</span> <span style="color:${col};font-weight:700">${ag.name}</span> <span class="log-msg">→ ${msg}</span>`;
+  logInner.insertBefore(el, logInner.firstChild);
+}
+
+function pad(n) { return String(n).padStart(2,'0'); }
+
+/* ═══════════════════════════════════════════
+   METRICS TICK
+═══════════════════════════════════════════ */
+const startTime = Date.now();
+let tasksDone   = 0;
+
+function updateMetrics() {
+  const elapsed = Math.floor((Date.now() - startTime) / 1000);
+  document.getElementById('m-upt').textContent = `${pad(Math.floor(elapsed/60))}:${pad(elapsed%60)}`;
+  document.getElementById('upt-bar').style.width = Math.min(elapsed/120*100, 100) + '%';
+  const tpm = Math.min(Math.round(tasksDone / (Math.max(elapsed,1)/60)), 99);
+  document.getElementById('m-tpm').textContent = tpm;
+  const acc = (88 + Math.random()*6).toFixed(1);
+  document.getElementById('m-acc').textContent = acc + '%';
+  document.getElementById('acc-bar').style.width = acc + '%';
+  document.getElementById('m-lat').textContent = Math.round(115 + Math.sin(elapsed*.18)*38 + Math.random()*28) + 'ms';
+  const t = new Date();
+  document.getElementById('tb-time').textContent = `${pad(t.getHours())}:${pad(t.getMinutes())}:${pad(t.getSeconds())}`;
+  HPIPES.forEach(h => {
+    const id = h.l.replace(/\s/g,'');
+    const v  = Math.round(68 + Math.random()*26);
+    const b  = document.getElementById('hb-'+id);
+    const p  = document.getElementById('hp-'+id);
+    if (b) b.style.width = v + '%';
+    if (p) p.textContent = v + '%';
+  });
+}
+
+/* ═══════════════════════════════════════════
+   AGENT TICK
+═══════════════════════════════════════════ */
+function tickAgents() {
+  AGENTS.forEach((ag, i) => {
+    ag.pct += Math.random()*4.5 + 1;
+    if (ag.pct >= 100) {
+      ag.pct = 0; tasksDone++;
+      const newTask = ag.tasks[Math.floor(Math.random()*ag.tasks.length)];
+      const tEl = document.getElementById('task-'+i);
+      if (tEl) tEl.textContent = newTask;
+      const fn = LOG_MSGS[Math.floor(Math.random()*LOG_MSGS.length)];
+      addLog(ag, fn(ag));
+    }
+    const bar = document.getElementById('bar-'+i);
+    const pct = document.getElementById('pct-'+i);
+    const row = document.getElementById('ag-'+i);
+    if (bar) bar.style.width = Math.min(ag.pct,100) + '%';
+    if (pct) pct.textContent = Math.floor(ag.pct) + '%';
+    if (row) row.className  = 'agent-row' + (Math.random()>.65 ? ' active':'');
+  });
+}
+
+/* ═══════════════════════════════════════════
+   WORKFLOW PIPELINE TICK
+═══════════════════════════════════════════ */
+let wfStep = 2, wfTick = 0;
+
+function tickWorkflow() {
+  wfTick++;
+  if (wfTick % 88 === 0) {
+    const cur = document.getElementById('wf'+wfStep);
+    const cs  = document.getElementById('ws'+wfStep);
+    if (cur) { cur.className = 'wf-node done'; if(cs) cs.textContent = '✓ done'; }
+    wfStep++;
+    if (wfStep >= 6) {
+      wfStep = 0;
+      for (let i = 0; i < 6; i++) {
+        const n = document.getElementById('wf'+i);
+        const s = document.getElementById('ws'+i);
+        if (n) n.className = 'wf-node idle';
+        if (s) s.textContent = 'waiting';
+      }
+      ['wf0','wf1'].forEach((id,i) => {
+        const n = document.getElementById(id);
+        const s = document.getElementById('ws'+i);
+        if (n) n.className = 'wf-node done';
+        if (s) s.textContent = '✓ done';
+      });
+      wfStep = 2;
+    }
+    if (wfStep < 6) {
+      const nxt = document.getElementById('wf'+wfStep);
+      const ns  = document.getElementById('ws'+wfStep);
+      if (nxt) nxt.className = 'wf-node running';
+      if (ns)  ns.textContent = 'running…';
+    }
+  }
+}
+
+setInterval(tickAgents,    400);
+setInterval(updateMetrics, 900);
+setInterval(tickWorkflow,  400);
+
+/* ═══════════════════════════════════════════
+   TYPEWRITER HEADLINE
+═══════════════════════════════════════════ */
+const LINES_RAW    = ['Master Agentic AI', '& Autonomous Systems', 'Build. Ship. Deploy.'];
+const LINES_STYLED = [
+  'Master <span style="color:#E85D30">Agentic AI</span>',
+  '& <span style="color:#5DCAA5">Autonomous Systems</span>',
+  '<span style="color:#7F77DD">Build. Ship. Deploy.</span>',
+];
+let li = 0, ci = 0, built = [];
+const hlText = document.getElementById('hl-text');
+
+function type() {
+  if (ci <= LINES_RAW[li].length) {
+    let v = '';
+    built.forEach(x => v += LINES_STYLED[x] + '<br>');
+    const cur = LINES_RAW[li].slice(0, ci);
+    const stl = cur
+      .replace('Agentic AI',        '<span style="color:#E85D30">Agentic AI</span>')
+      .replace('Autonomous Systems', '<span style="color:#5DCAA5">Autonomous Systems</span>')
+      .replace('Build. Ship. Deploy.','<span style="color:#7F77DD">Build. Ship. Deploy.</span>');
+    v += stl + (ci < LINES_RAW[li].length ? '<span style="border-right:2px solid #7F77DD">&nbsp;</span>' : '');
+    hlText.innerHTML = v;
+    ci++;
+    setTimeout(type, ci === 1 ? 500 : 48 + Math.random()*22);
+  } else {
+    built.push(li); li++; ci = 0;
+    if (li < LINES_RAW.length) {
+      setTimeout(type, 440);
+    } else {
+      hlText.innerHTML = LINES_STYLED.join('<br>');
+      setTimeout(() => document.getElementById('hl-sub').style.opacity  = '1', 300);
+      setTimeout(() => document.getElementById('hl-cta').style.opacity  = '1', 700);
+      setTimeout(() => document.getElementById('wf-bar').style.opacity  = '1', 950);
+      setTimeout(() => document.getElementById('scroll-hint').style.opacity = '1', 1400);
+    }
+  }
+}
+
+/* ── Kick everything off ── */
+addLog(AGENTS[0], 'System initialized · all agents online');
+addLog(AGENTS[3], 'MonitorAgent ● baseline metrics captured');
+addLog(AGENTS[1], 'ResearchAgent ● corpus loaded: 12,400 chunks');
+
+setTimeout(() => document.getElementById('hl-badge').style.opacity = '1', 400);
+setTimeout(type, 950);
+</script>
+</body>
+</html>

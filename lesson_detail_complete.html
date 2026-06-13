@@ -1,0 +1,1427 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load dict_extras %}
+{% load custom_filters %}
+
+{% block title %}
+{{ module.title }} - {{ course.title }} - MentorX Academy
+{% endblock %}
+
+{% block content %}
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════════════════════
+   MentorX Academy — Lesson Detail Page
+   Corporate & Professional Design System v2.0
+   Complete production file — all states covered
+═══════════════════════════════════════════════════════ */
+
+:root {
+  --brand:        #4f46e5;
+  --brand-dark:   #3730a3;
+  --brand-light:  #eef2ff;
+  --brand-mid:    #818cf8;
+  --success:      #16a34a;
+  --success-bg:   #f0fdf4;
+  --warning:      #b45309;
+  --warning-bg:   #fffbeb;
+  --danger:       #dc2626;
+  --danger-bg:    #fef2f2;
+  --info:         #0369a1;
+  --info-bg:      #f0f9ff;
+  --text-primary:   #0f172a;
+  --text-secondary: #475569;
+  --text-muted:     #94a3b8;
+  --surface:        #ffffff;
+  --surface-2:      #f8fafc;
+  --surface-3:      #f1f5f9;
+  --border:         #e2e8f0;
+  --border-strong:  #cbd5e1;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
+  --shadow-lg: 0 10px 30px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --font: 'Inter', 'Segoe UI', system-ui, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; font-family: var(--font); }
+
+/* ── Page shell ── */
+.lesson-page {
+  background: var(--surface-2);
+  min-height: 100vh;
+  padding: 20px 0 48px;
+}
+.lesson-container { max-width: 1400px; margin: 0 auto; }
+
+/* ── Back button ── */
+.back-to-course {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: var(--surface);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  transition: all 0.15s;
+  box-shadow: var(--shadow-sm);
+}
+.back-to-course:hover {
+  background: var(--brand-light);
+  color: var(--brand);
+  border-color: rgba(79,70,229,0.25);
+  transform: none;
+  box-shadow: var(--shadow-sm);
+}
+.back-to-course i { font-size: 11px; }
+
+/* ── Main content card ── */
+.lesson-main-content {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+/* ── Module header ── */
+.module-header {
+  background: #0f172a;
+  padding: 20px 28px;
+  position: relative;
+  overflow: hidden;
+}
+.module-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(79,70,229,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(79,70,229,0.08) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+}
+.module-header::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px; height: 100%;
+  background: var(--brand);
+}
+.module-header-content { position: relative; z-index: 2; }
+
+.module-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(79,70,229,0.2);
+  border: 1px solid rgba(79,70,229,0.35);
+  color: var(--brand-mid);
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+.module-header h1 {
+  font-size: clamp(16px, 2.5vw, 22px);
+  font-weight: 700;
+  color: #f8fafc !important;
+  margin-bottom: 8px;
+  line-height: 1.25;
+  letter-spacing: -0.2px;
+}
+.module-meta {
+  display: flex; gap: 18px; flex-wrap: wrap; align-items: center;
+}
+.module-meta-item {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 12px; font-weight: 500; color: #94a3b8 !important;
+}
+.module-meta-item i { font-size: 11px; color: #64748b; }
+
+/* ── Video section ── */
+.video-section { position: relative; background: #000; }
+.lesson-video-player {
+  width: 100%; height: 420px;
+  background: #000; display: block;
+}
+
+/* ── Coming soon placeholder ── */
+.video-placeholder,
+.coming-soon-placeholder {
+  background: #0f172a;
+  min-height: 420px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.coming-soon-placeholder::before,
+.video-placeholder::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(79,70,229,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(79,70,229,0.06) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: none;
+}
+.coming-soon-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 64px 32px;
+}
+.coming-soon-icon {
+  width: 96px; height: 96px;
+  background: rgba(79,70,229,0.12);
+  border: 1px solid rgba(79,70,229,0.25);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 28px;
+  animation: none;
+}
+.coming-soon-icon i { font-size: 40px; color: var(--brand-mid); }
+.coming-soon-content h3 {
+  color: #f1f5f9; font-size: 22px; font-weight: 700; margin-bottom: 12px;
+}
+.coming-soon-content p {
+  color: #64748b; font-size: 14px; margin-bottom: 28px;
+  max-width: 400px; margin-left: auto; margin-right: auto; line-height: 1.65;
+}
+.coming-soon-badge-large {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(79,70,229,0.12);
+  border: 1px solid rgba(79,70,229,0.25);
+  padding: 10px 24px; border-radius: 4px;
+  font-size: 13px; font-weight: 600; color: var(--brand-mid);
+}
+
+/* ── Quiz section ── */
+.quiz-container { padding: 28px; }
+.quiz-header {
+  text-align: center; margin-bottom: 24px;
+  padding-bottom: 20px; border-bottom: 1px solid var(--border);
+}
+.quiz-header h2 { color: var(--text-primary); font-weight: 700; font-size: 18px; margin-bottom: 6px; }
+.quiz-header p { font-size: 13px; color: var(--text-secondary); margin: 0 0 12px; }
+
+.quiz-info { display: flex; justify-content: center; gap: 32px; margin-top: 16px; }
+.quiz-info-item {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 600; color: var(--text-secondary);
+}
+.quiz-info-item i { color: var(--brand); font-size: 15px; }
+
+.question-counter {
+  text-align: center; color: var(--text-muted); font-size: 12px;
+  font-weight: 600; margin-bottom: 16px;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+.quiz-slider-container { position: relative; overflow: hidden; }
+.quiz-questions-slider { display: flex; transition: transform 0.3s ease; }
+.quiz-slide { min-width: 100%; flex-shrink: 0; }
+
+.quiz-question-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  animation: none;
+}
+.question-number {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px;
+  background: var(--brand-light); color: var(--brand);
+  border-radius: 4px; font-weight: 700; font-size: 12px; margin-bottom: 12px;
+}
+.question-text {
+  font-size: 15px; font-weight: 600; color: var(--text-primary);
+  margin-bottom: 18px; line-height: 1.55;
+}
+
+.quiz-choices { display: flex; flex-direction: column; gap: 8px; }
+.choice-option { position: relative; }
+.choice-option input[type="radio"] { display: none; }
+.choice-label {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  font-size: 13px; color: var(--text-secondary); font-weight: 500;
+}
+.choice-label:hover { border-color: var(--brand); background: var(--brand-light); color: var(--brand); }
+.choice-option input[type="radio"]:checked + .choice-label {
+  border-color: var(--brand); background: var(--brand-light);
+  color: var(--brand); font-weight: 600;
+}
+.choice-indicator {
+  width: 18px; height: 18px;
+  border: 2px solid var(--border-strong);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all 0.15s;
+}
+.choice-option input[type="radio"]:checked + .choice-label .choice-indicator {
+  border-color: var(--brand); background: var(--brand);
+}
+.choice-option input[type="radio"]:checked + .choice-label .choice-indicator::after {
+  content: ''; width: 5px; height: 5px; background: #fff; border-radius: 50%;
+}
+.choice-text { flex: 1; }
+
+.quiz-navigation-dots {
+  display: flex; justify-content: center; gap: 6px; margin: 20px 0 14px;
+}
+.quiz-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--border-strong); cursor: pointer; transition: all 0.2s;
+}
+.quiz-dot.active { background: var(--brand); width: 20px; border-radius: 4px; }
+.quiz-dot.answered { background: var(--success); }
+
+.quiz-slider-nav {
+  display: flex; justify-content: space-between; margin-top: 16px; gap: 10px;
+}
+.quiz-nav-btn {
+  padding: 8px 18px;
+  background: var(--brand); color: #fff;
+  border: none; border-radius: var(--radius-sm);
+  cursor: pointer; font-weight: 600; font-size: 12px;
+  transition: background 0.15s;
+}
+.quiz-nav-btn:hover:not(:disabled) { background: var(--brand-dark); }
+.quiz-nav-btn:disabled { background: var(--surface-3); color: var(--text-muted); cursor: not-allowed; }
+
+/* Quiz timer (kept but simplified) */
+.quiz-timer {
+  background: var(--danger-bg);
+  border: 1px solid rgba(220,38,38,0.2);
+  color: var(--danger);
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  font-size: 20px; font-weight: 700;
+  text-align: center; margin-bottom: 24px;
+}
+
+/* Quiz results */
+.quiz-results {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 40px 32px; text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+.result-score {
+  font-size: 56px; font-weight: 800; color: var(--brand);
+  line-height: 1; margin-bottom: 10px;
+  background: none; -webkit-text-fill-color: unset; background-clip: unset;
+}
+.result-message { font-size: 17px; color: var(--text-primary); font-weight: 700; margin-bottom: 24px; }
+.result-details {
+  display: flex; justify-content: center; gap: 40px;
+  margin-top: 24px; padding-top: 24px;
+  border-top: 1px solid var(--border); flex-wrap: wrap;
+}
+.result-detail-item { text-align: center; }
+.result-detail-item .number {
+  font-size: 28px; font-weight: 700; color: var(--brand); display: block;
+}
+.result-detail-item .label {
+  font-size: 11px; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-top: 2px;
+}
+
+/* ── Assignment section ── */
+.assignment-container { padding: 28px; animation: none; }
+.assignment-header {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--brand);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding: 20px 24px; margin-bottom: 20px;
+}
+.assignment-header h2 {
+  color: var(--text-primary); font-weight: 700; font-size: 17px; margin-bottom: 14px;
+}
+.assignment-meta { display: flex; gap: 24px; flex-wrap: wrap; }
+.assignment-meta-item {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 12px; font-weight: 600; color: var(--text-secondary);
+}
+.assignment-meta-item i { color: var(--brand); }
+
+.assignment-instructions {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px 24px; margin-bottom: 20px;
+  box-shadow: var(--shadow-sm); animation: none;
+}
+.assignment-instructions h3 {
+  color: var(--text-primary); font-weight: 700; font-size: 13px;
+  margin-bottom: 14px; display: flex; align-items: center; gap: 7px;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.assignment-instructions h3 i { color: var(--brand); }
+.instructions-content { color: var(--text-secondary); line-height: 1.75; font-size: 14px; }
+
+.submission-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px 24px; box-shadow: var(--shadow-sm); animation: none;
+}
+.submission-section h3 {
+  color: var(--text-primary); font-weight: 700; font-size: 13px;
+  margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+.file-upload-area {
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: 36px 24px; text-align: center;
+  background: var(--surface-2);
+  transition: border-color 0.15s, background 0.15s;
+  cursor: pointer; margin-bottom: 16px;
+}
+.file-upload-area:hover,
+.file-upload-area.drag-over { border-color: var(--brand); background: var(--brand-light); }
+.upload-icon { font-size: 36px; color: var(--brand); margin-bottom: 12px; opacity: 0.7; }
+.upload-text { font-size: 14px; color: var(--text-primary); font-weight: 600; margin-bottom: 4px; }
+.upload-hint { font-size: 12px; color: var(--text-muted); }
+.file-input-hidden { display: none; }
+
+.selected-file {
+  background: var(--success-bg);
+  border: 1px solid rgba(22,163,74,0.2);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.selected-file-info { display: flex; align-items: center; gap: 10px; }
+.selected-file-info i { color: var(--success); font-size: 18px; }
+.remove-file-btn {
+  background: var(--danger-bg); color: var(--danger);
+  border: 1px solid rgba(220,38,38,0.2);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px; cursor: pointer; font-size: 12px; font-weight: 600;
+  transition: all 0.15s;
+}
+.remove-file-btn:hover { background: var(--danger); color: #fff; }
+
+.submission-status {
+  background: var(--success-bg);
+  border: 1px solid rgba(22,163,74,0.2);
+  padding: 20px 24px;
+  border-radius: var(--radius-md); margin-bottom: 20px;
+}
+.submission-status h4 {
+  color: var(--success); font-weight: 700; font-size: 14px;
+  margin-bottom: 12px; display: flex; align-items: center; gap: 7px;
+}
+.submission-info { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--text-secondary); }
+.grade-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px;
+  background: var(--success); color: #fff;
+  border-radius: 4px; font-weight: 700; font-size: 12px; margin-top: 8px;
+}
+
+/* ── Navigation bar ── */
+.lesson-navigation {
+  padding: 18px 28px;
+  background: var(--surface-2);
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between;
+  align-items: center; gap: 12px; flex-wrap: wrap;
+}
+.nav-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 18px;
+  background: var(--brand); color: #fff;
+  border: none; border-radius: var(--radius-sm);
+  font-weight: 600; font-size: 13px;
+  cursor: pointer; text-decoration: none;
+  transition: background 0.15s;
+  box-shadow: none;
+}
+.nav-btn:hover { background: var(--brand-dark); color: #fff; transform: none; box-shadow: none; }
+.nav-btn:disabled {
+  background: var(--surface-3); color: var(--text-muted);
+  border: 1px solid var(--border); cursor: not-allowed;
+}
+.nav-btn-secondary {
+  background: var(--surface); color: var(--brand); border: 1px solid var(--brand);
+}
+.nav-btn-secondary:hover { background: var(--brand-light); color: var(--brand); }
+.complete-btn { background: var(--success); }
+.complete-btn:hover { background: #15803d; }
+.submit-quiz-btn { background: #7c3aed; font-size: 13px; padding: 9px 20px; }
+.submit-quiz-btn:hover { background: #6d28d9; }
+
+/* ── Notes & Resources ── */
+.notes-resources-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden; margin-top: 16px;
+}
+.notes-resources-section.hidden { display: none; }
+
+.section-tabs {
+  display: flex; border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+}
+.section-tab {
+  flex: 1; padding: 14px 16px; text-align: center;
+  background: transparent; border: none;
+  border-bottom: 3px solid transparent;
+  font-size: 12px; font-weight: 600; color: var(--text-secondary);
+  cursor: pointer; transition: color 0.15s, border-color 0.15s;
+  letter-spacing: 0.3px;
+}
+.section-tab:hover { color: var(--brand); }
+.section-tab.active { color: var(--brand); border-bottom-color: var(--brand); }
+.section-tab.active::after { display: none; }
+.section-tab i { margin-right: 5px; }
+
+.section-tab-content { padding: 24px; display: none; }
+.section-tab-content.active { display: block; }
+.section-tab-content h3 {
+  font-size: 13px; font-weight: 700; color: var(--text-primary);
+  margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+.notes-editor {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px; min-height: 140px;
+  font-size: 14px; line-height: 1.65;
+  background: var(--surface-2); color: var(--text-primary);
+  width: 100%; resize: vertical; display: block; margin-bottom: 12px;
+  transition: border-color 0.15s;
+}
+.notes-editor:focus {
+  outline: none; border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(79,70,229,0.08);
+  background: var(--surface);
+}
+.notes-actions { display: flex; gap: 8px; }
+
+.resources-list { display: flex; flex-direction: column; gap: 12px; }
+.resource-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 18px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.resource-item:hover { border-color: var(--border-strong); box-shadow: var(--shadow-sm); }
+.resource-info { display: flex; align-items: center; gap: 14px; }
+.resource-icon {
+  width: 40px; height: 40px; border-radius: var(--radius-sm);
+  background: var(--brand-light); color: var(--brand);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.resource-details h4 { margin: 0 0 3px; font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.resource-details p { margin: 0; font-size: 12px; color: var(--text-muted); }
+.download-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; background: var(--brand); color: #fff;
+  border: none; border-radius: var(--radius-sm);
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  text-decoration: none; transition: background 0.15s;
+}
+.download-btn:hover { background: var(--brand-dark); color: #fff; transform: none; box-shadow: none; }
+
+/* ── Sidebar ── */
+.lesson-sidebar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  position: sticky; top: 90px;
+}
+.sidebar-header {
+  background: #0f172a;
+  padding: 18px 20px;
+  position: relative; overflow: hidden;
+}
+.sidebar-header::before {
+  content: ''; position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(79,70,229,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(79,70,229,0.08) 1px, transparent 1px);
+  background-size: 32px 32px; pointer-events: none;
+}
+.sidebar-header::after {
+  content: ''; position: absolute;
+  top: 0; left: 0; width: 4px; height: 100%;
+  background: var(--brand);
+}
+.sidebar-header h3 {
+  color: #f1f5f9 !important;
+  font-size: 11px; font-weight: 700;
+  margin-bottom: 14px; position: relative; z-index: 2;
+  text-transform: uppercase; letter-spacing: 0.8px;
+}
+
+.course-progress-sidebar {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px; position: relative; z-index: 2;
+}
+.progress-bar-container-sidebar {
+  background: rgba(255,255,255,0.1);
+  height: 5px; border-radius: 3px; overflow: hidden; margin-bottom: 8px;
+}
+.progress-bar-fill-sidebar {
+  height: 100%; background: var(--brand-mid);
+  border-radius: 3px; transition: width 0.5s ease;
+}
+.progress-text-sidebar {
+  font-size: 11px; font-weight: 600; text-align: center;
+  color: #94a3b8; letter-spacing: 0.3px;
+}
+
+.sidebar-modules { max-height: 480px; overflow-y: auto; }
+.sidebar-modules::-webkit-scrollbar { width: 4px; }
+.sidebar-modules::-webkit-scrollbar-track { background: var(--surface-2); }
+.sidebar-modules::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+
+.sidebar-module-item { border-bottom: 1px solid var(--border); }
+.sidebar-module-item:last-child { border-bottom: none; }
+.sidebar-module-link {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 16px; text-decoration: none;
+  color: var(--text-secondary); transition: background 0.15s; font-size: 13px;
+}
+.sidebar-module-link:hover { background: var(--surface-2); color: var(--text-primary); }
+.sidebar-module-item.active .sidebar-module-link {
+  background: var(--brand-light);
+  border-left: 3px solid var(--brand);
+  color: var(--brand);
+}
+
+.sidebar-module-icon {
+  width: 30px; height: 30px; border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; flex-shrink: 0;
+}
+.sidebar-module-icon.lesson { background: var(--brand-light); color: var(--brand); }
+.sidebar-module-icon.quiz    { background: var(--info-bg); color: var(--info); }
+.sidebar-module-icon.assignment { background: #fdf4ff; color: #9333ea; }
+
+.sidebar-module-content { flex: 1; min-width: 0; }
+.sidebar-module-title {
+  font-weight: 600; font-size: 12px; margin-bottom: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sidebar-module-duration { font-size: 10px; color: var(--text-muted); }
+.sidebar-module-status {
+  width: 18px; height: 18px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; flex-shrink: 0;
+}
+.sidebar-module-status.completed { background: var(--success); color: #fff; }
+.sidebar-module-status.current   { background: var(--brand); color: #fff; }
+.sidebar-module-status.locked    {
+  background: var(--surface-3); color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+/* ── Loading overlay ── */
+.loading-overlay {
+  position: fixed; inset: 0;
+  background: rgba(255,255,255,0.9);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999; opacity: 0; visibility: hidden; transition: all 0.2s;
+}
+.loading-overlay.active { opacity: 1; visibility: visible; }
+.spinner {
+  width: 40px; height: 40px;
+  border: 3px solid var(--border);
+  border-top: 3px solid var(--brand);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+
+/* ── Toast notifications ── */
+@keyframes slideIn {
+  from { transform: translateX(400px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideOut {
+  from { transform: translateX(0); opacity: 1; }
+  to   { transform: translateX(400px); opacity: 0; }
+}
+
+/* ── Kill old animations ── */
+@keyframes rotate-gradient { 0%,100%{transform:none} }
+@keyframes pulse-icon       { 0%,100%{transform:none;box-shadow:none} }
+@keyframes fadeIn           { from{opacity:1;transform:none} to{opacity:1;transform:none} }
+.quiz-question-card, .assignment-instructions, .submission-section { animation: none; }
+
+/* ── S3 video modal ── */
+.s3-video-modal {
+  display: none; position: fixed; inset: 0;
+  z-index: 10000; background: rgba(0,0,0,0.85);
+}
+.s3-video-backdrop {
+  position: absolute; inset: 0; cursor: pointer;
+}
+.s3-video-content {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  max-width: 90vw; max-height: 90vh;
+  background: #000; border-radius: var(--radius-lg);
+  overflow: hidden; box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+}
+.s3-video-close {
+  position: absolute; top: -40px; right: 0;
+  background: none; border: none; color: #fff;
+  font-size: 28px; cursor: pointer;
+  padding: 4px 10px; border-radius: var(--radius-sm);
+  transition: background 0.15s;
+}
+.s3-video-close:hover { background: rgba(255,255,255,0.15); }
+.s3-video-content video { width: 100%; max-height: 80vh; display: block; }
+body.modal-open { overflow: hidden; }
+
+/* ── Responsive ── */
+@media (max-width: 992px) {
+  .lesson-sidebar { position: relative; top: 0; margin-top: 20px; }
+  .lesson-video-player { height: 340px; }
+  .coming-soon-placeholder { min-height: 340px; }
+}
+@media (max-width: 768px) {
+  .lesson-page { padding: 12px 0 32px; }
+  .module-header { padding: 16px 20px; }
+  .module-header h1 { font-size: 16px; }
+  .lesson-video-player { height: 240px; }
+  .coming-soon-placeholder { min-height: 280px; }
+  .quiz-container, .assignment-container { padding: 20px 16px; }
+  .lesson-navigation { padding: 14px 16px; }
+  .result-details { gap: 20px; }
+  .quiz-info { flex-direction: column; align-items: center; gap: 10px; }
+  .section-tab { padding: 12px 10px; font-size: 11px; }
+  .section-tab-content { padding: 16px; }
+  .nav-btn { padding: 8px 14px; font-size: 12px; }
+  .resource-item { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .download-btn { width: 100%; justify-content: center; }
+}
+@media (max-width: 480px) {
+  .lesson-navigation { flex-direction: column; align-items: stretch; }
+  .lesson-navigation > div { display: flex; justify-content: center; }
+  .result-details { flex-direction: column; }
+  .assignment-meta { flex-direction: column; gap: 10px; }
+}
+</style>
+
+<section class="lesson-page">
+    <div class="container lesson-container">
+
+        <a href="{% url 'course_detail' course.id %}" class="back-to-course">
+            <i class="fas fa-arrow-left"></i> Back to Course
+        </a>
+
+        <div class="row">
+            <!-- ═══ MAIN CONTENT ═══ -->
+            <div class="col-lg-8">
+                <div class="lesson-main-content">
+
+                    <!-- Module Header -->
+                    <div class="module-header">
+                        <div class="module-header-content">
+                            <div class="module-type-badge">
+                                {% if module.module_type == 'lesson' %}
+                                    <i class="fas fa-play-circle"></i> Lesson
+                                {% elif module.module_type == 'quiz' %}
+                                    <i class="fas fa-question-circle"></i> Quiz
+                                {% elif module.module_type == 'assignment' %}
+                                    <i class="fas fa-file-alt"></i> Assignment
+                                {% endif %}
+                            </div>
+                            <h1>{{ module.title }}</h1>
+                            <div class="module-meta">
+                                <div class="module-meta-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>{{ module.duration_in_minutes|format_duration }}</span>
+                                </div>
+                                <div class="module-meta-item">
+                                    <i class="fas fa-book"></i>
+                                    <span>{{ course.title }}</span>
+                                </div>
+                                {% if is_completed %}
+                                <div class="module-meta-item" style="color:#5DCAA5">
+                                    <i class="fas fa-check-circle" style="color:#5DCAA5"></i>
+                                    <span>Completed</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ── LESSON: Video ── -->
+                    {% if module.module_type == 'lesson' %}
+                        <div class="video-section">
+                            {% if module.video_url or module.video_file %}
+                                {% include 'lesson/secure_video_player_simple.html' %}
+                            {% else %}
+                                <div class="coming-soon-placeholder">
+                                    <div class="coming-soon-content">
+                                        <div class="coming-soon-icon">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                        <h3>Content Coming Soon</h3>
+                                        <p>This lesson is currently being prepared. Please check back later.</p>
+                                        <div class="coming-soon-badge-large">
+                                            <i class="fas fa-hourglass-half"></i> In Development
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                    <!-- ── QUIZ ── -->
+                    {% elif module.module_type == 'quiz' %}
+                        <div class="quiz-container">
+                            {% if quiz %}
+                                {% if not latest_submission %}
+                                    <div class="quiz-header">
+                                        <h2>{{ quiz.title }}</h2>
+                                        {% if quiz.description %}
+                                            <p>{{ quiz.description }}</p>
+                                        {% endif %}
+                                        <div class="quiz-info">
+                                            <div class="quiz-info-item">
+                                                <i class="fas fa-question-circle"></i>
+                                                <span>{{ questions|length }} Questions</span>
+                                            </div>
+                                            <div class="quiz-info-item">
+                                                <i class="fas fa-clock"></i>
+                                                <span>{{ module.duration_in_minutes|format_duration }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="question-counter">
+                                        Question <span id="currentQuestionNum">1</span> of {{ questions|length }}
+                                    </div>
+
+                                    <form id="quizForm" method="POST">
+                                        {% csrf_token %}
+                                        <div class="quiz-slider-container">
+                                            <div class="quiz-questions-slider" id="quizSlider">
+                                                {% for question in questions %}
+                                                    <div class="quiz-slide" data-question-index="{{ forloop.counter0 }}">
+                                                        <div class="quiz-question-card" data-question-id="{{ question.id }}">
+                                                            <div class="question-number">{{ forloop.counter }}</div>
+                                                            <div class="question-text">{{ question.text }}</div>
+                                                            <div class="quiz-choices">
+                                                                {% for choice in question.choices.all %}
+                                                                    <div class="choice-option">
+                                                                        <input type="radio"
+                                                                            name="question_{{ question.id }}"
+                                                                            value="{{ choice.id }}"
+                                                                            id="choice_{{ choice.id }}_{{ forloop.counter }}"
+                                                                            data-question-id="{{ question.id }}">
+                                                                        <label for="choice_{{ choice.id }}_{{ forloop.counter }}" class="choice-label">
+                                                                            <span class="choice-indicator"></span>
+                                                                            <span class="choice-text">{{ choice.text }}</span>
+                                                                        </label>
+                                                                    </div>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+
+                                        <div class="quiz-navigation-dots" id="quizDots">
+                                            {% for question in questions %}
+                                                <div class="quiz-dot {% if forloop.first %}active{% endif %}" data-index="{{ forloop.counter0 }}"></div>
+                                            {% endfor %}
+                                        </div>
+
+                                        <div class="quiz-slider-nav">
+                                            <button type="button" class="quiz-nav-btn" id="prevQuestionBtn" disabled>
+                                                <i class="fas fa-chevron-left"></i> Previous
+                                            </button>
+                                            <button type="button" class="quiz-nav-btn" id="nextQuestionBtn">
+                                                Next <i class="fas fa-chevron-right"></i>
+                                            </button>
+                                        </div>
+                                    </form>
+
+                                {% else %}
+                                    <!-- Quiz Results -->
+                                    <div class="quiz-results">
+                                        <div class="result-score">{{ latest_submission.score }}%</div>
+                                        <div class="result-message">
+                                            {% if latest_submission.score >= 80 %}Excellent Work!
+                                            {% elif latest_submission.score >= 60 %}Good Job!
+                                            {% else %}Keep Practicing!{% endif %}
+                                        </div>
+                                        <div class="result-details">
+                                            <div class="result-detail-item">
+                                                <div class="number">{{ latest_submission.score }}%</div>
+                                                <div class="label">Your Score</div>
+                                            </div>
+                                            <div class="result-detail-item">
+                                                <div class="number">{{ questions|length }}</div>
+                                                <div class="label">Total Questions</div>
+                                            </div>
+                                            <div class="result-detail-item">
+                                                <div class="number">{{ latest_submission.submitted_at|date:"M d" }}</div>
+                                                <div class="label">Submitted</div>
+                                            </div>
+                                        </div>
+                                        <div style="margin-top:28px;text-align:center">
+                                            <form method="POST" action="{% url 'lesson_detail' course.id module.id %}" style="display:inline-block">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="retry_quiz" value="1">
+                                                <button type="submit" class="nav-btn" style="background:var(--warning)">
+                                                    <i class="fas fa-redo"></i> Retake Quiz
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% else %}
+                                <div class="text-center py-5" style="color:var(--text-muted)">
+                                    <i class="fas fa-exclamation-circle" style="font-size:40px;margin-bottom:12px;display:block;color:var(--warning)"></i>
+                                    <p>No quiz available for this module.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                    <!-- ── ASSIGNMENT ── -->
+                    {% elif module.module_type == 'assignment' %}
+                        <div class="assignment-container">
+                            {% if assignment %}
+                                <div class="assignment-header">
+                                    <h2>{{ assignment.title }}</h2>
+                                    <div class="assignment-meta">
+                                        {% if assignment.due_date %}
+                                        <div class="assignment-meta-item">
+                                            <i class="fas fa-calendar-alt"></i>
+                                            <span>Due: {{ assignment.due_date|date:"M d, Y H:i" }}</span>
+                                        </div>
+                                        {% endif %}
+                                        <div class="assignment-meta-item">
+                                            <i class="fas fa-clock"></i>
+                                            <span>{{ module.duration_in_minutes|format_duration }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="assignment-instructions">
+                                    <h3><i class="fas fa-info-circle"></i> Instructions</h3>
+                                    <div class="instructions-content">
+                                        {{ assignment.instructions|linebreaks }}
+                                    </div>
+                                </div>
+
+                                {% if user_submission %}
+                                    <div class="submission-status">
+                                        <h4><i class="fas fa-check-circle"></i> Submission Received</h4>
+                                        <div class="submission-info">
+                                            <div>Submitted on: {{ user_submission.submitted_at|date:"M d, Y H:i" }}</div>
+                                            {% if user_submission.submission_file %}
+                                                <div>File: {{ user_submission.submission_file.name }}</div>
+                                            {% endif %}
+                                            {% if user_submission.grade %}
+                                                <div class="grade-badge">
+                                                    <i class="fas fa-star"></i> Grade: {{ user_submission.grade }}
+                                                </div>
+                                            {% else %}
+                                                <div>Status: Pending Review</div>
+                                            {% endif %}
+                                            {% if user_submission.feedback %}
+                                                <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(22,163,74,0.2)">
+                                                    <strong>Feedback:</strong><br>{{ user_submission.feedback }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="submission-section">
+                                        <h3>Submit Your Work</h3>
+                                        <form id="assignmentForm" method="POST" enctype="multipart/form-data">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="submit_assignment" value="1">
+                                            <div class="file-upload-area" id="fileUploadArea">
+                                                <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                                                <div class="upload-text">Drag & drop your file here</div>
+                                                <div class="upload-hint">or click to browse — PDF, DOC, ZIP (max 10 MB)</div>
+                                                <input type="file" name="assignment_file" id="submissionFile"
+                                                    class="file-input-hidden"
+                                                    accept=".pdf,.doc,.docx,.txt,.zip,.jpg,.png">
+                                            </div>
+                                            <div id="selectedFileDisplay" style="display:none">
+                                                <div class="selected-file">
+                                                    <div class="selected-file-info">
+                                                        <i class="fas fa-file"></i>
+                                                        <span id="selectedFileName"></span>
+                                                    </div>
+                                                    <button type="button" class="remove-file-btn" id="removeFileBtn">
+                                                        <i class="fas fa-times"></i> Remove
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="submissionText" style="font-size:13px;font-weight:600;color:var(--text-primary);display:block;margin-bottom:8px">Or write your submission</label>
+                                                <textarea name="submission_text" id="submissionText"
+                                                    class="form-control" rows="6"
+                                                    placeholder="Type your answer or paste a link here..."
+                                                    style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;font-size:14px;resize:vertical;background:var(--surface-2)"></textarea>
+                                            </div>
+                                        </form>
+                                    </div>
+                                {% endif %}
+                            {% else %}
+                                <div class="text-center py-5" style="color:var(--text-muted)">
+                                    <i class="fas fa-exclamation-circle" style="font-size:40px;margin-bottom:12px;display:block;color:var(--warning)"></i>
+                                    <p>No assignment available for this module.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                    <!-- ── Navigation Buttons ── -->
+                    <div class="lesson-navigation">
+                        <div>
+                            {% if prev_module %}
+                                <a href="{% url 'lesson_detail' course.id prev_module.id %}" class="nav-btn nav-btn-secondary">
+                                    <i class="fas fa-chevron-left"></i> Previous
+                                </a>
+                            {% else %}
+                                <button class="nav-btn nav-btn-secondary" disabled>
+                                    <i class="fas fa-chevron-left"></i> Previous
+                                </button>
+                            {% endif %}
+                        </div>
+
+                        <div style="display:flex;gap:10px;flex-wrap:wrap">
+                            {% if module.module_type == 'lesson' and not is_completed %}
+                                <button class="nav-btn complete-btn" id="markCompleteBtn">
+                                    <i class="fas fa-check"></i> Mark as Complete
+                                </button>
+                            {% elif module.module_type == 'quiz' and not latest_submission %}
+                                <button class="nav-btn submit-quiz-btn" id="submitQuizBtn">
+                                    <i class="fas fa-paper-plane"></i> Submit Quiz
+                                </button>
+                            {% elif module.module_type == 'assignment' and not user_submission %}
+                                <button class="nav-btn submit-quiz-btn" id="submitAssignmentBtn">
+                                    <i class="fas fa-paper-plane"></i> Submit Assignment
+                                </button>
+                            {% endif %}
+
+                            {% if next_module %}
+                                <a href="{% url 'lesson_detail' course.id next_module.id %}" class="nav-btn">
+                                    Next <i class="fas fa-chevron-right"></i>
+                                </a>
+                            {% else %}
+                                <a href="{% url 'course_detail' course.id %}" class="nav-btn">
+                                    Back to Course <i class="fas fa-home"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Notes & Resources ── -->
+                <div class="notes-resources-section {% if module.module_type == 'quiz' or module.module_type == 'assignment' %}hidden{% endif %}" id="notesResourcesSection">
+                    <div class="section-tabs">
+                        <button class="section-tab active" data-tab="notes">
+                            <i class="fas fa-sticky-note"></i> Notes
+                        </button>
+                        <button class="section-tab" data-tab="resources">
+                            <i class="fas fa-download"></i> Resources
+                        </button>
+                    </div>
+                    <div class="section-tab-content active" id="notesTab">
+                        <h3>My Notes</h3>
+                        <textarea id="notesEditor" class="notes-editor"
+                            placeholder="Take notes while learning...">{{ user_notes }}</textarea>
+                        <div class="notes-actions">
+                            <button class="nav-btn" id="saveNotesBtn">
+                                <i class="fas fa-save"></i> Save Notes
+                            </button>
+                            <button class="nav-btn nav-btn-secondary" id="clearNotesBtn">
+                                <i class="fas fa-trash"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-tab-content" id="resourcesTab">
+                        <h3>Lesson Resources</h3>
+                        <div class="resources-list">
+                            {% if module_resources %}
+                                {% for resource in module_resources %}
+                                    <div class="resource-item">
+                                        <div class="resource-info">
+                                            <div class="resource-icon">
+                                                <i class="fas {{ resource.get_file_icon }}"></i>
+                                            </div>
+                                            <div class="resource-details">
+                                                <h4>{{ resource.title }}</h4>
+                                                <p>{{ resource.get_file_extension }}{% if resource.file_size %} &bull; {{ resource.file_size }}{% endif %}</p>
+                                                {% if resource.description %}
+                                                    <p style="margin-top:4px">{{ resource.description }}</p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <a href="{{ resource.file.url }}" download class="download-btn">
+                                            <i class="fas fa-download"></i> Download
+                                        </a>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-center py-4" style="color:var(--text-muted)">
+                                    <i class="fas fa-inbox" style="font-size:32px;margin-bottom:10px;display:block"></i>
+                                    <p style="font-size:13px">No resources available for this lesson.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ SIDEBAR ═══ -->
+            <div class="col-lg-4">
+                <div class="lesson-sidebar">
+                    <div class="sidebar-header">
+                        <h3>Course Content</h3>
+                        <div class="course-progress-sidebar">
+                            <div class="progress-bar-container-sidebar">
+                                <div class="progress-bar-fill-sidebar" style="width:{{ course_progress }}%"></div>
+                            </div>
+                            <div class="progress-text-sidebar">{{ course_progress }}% Complete</div>
+                        </div>
+                    </div>
+                    <div class="sidebar-modules">
+                        {% for mod in modules %}
+                            <div class="sidebar-module-item {% if mod.id == module.id %}active{% endif %}">
+                                <a href="{% url 'lesson_detail' course.id mod.id %}" class="sidebar-module-link">
+                                    <div class="sidebar-module-icon {{ mod.module_type }}">
+                                        {% if mod.module_type == 'lesson' %}
+                                            <i class="fas fa-play" style="font-size:10px"></i>
+                                        {% elif mod.module_type == 'quiz' %}
+                                            <i class="fas fa-question" style="font-size:10px"></i>
+                                        {% elif mod.module_type == 'assignment' %}
+                                            <i class="fas fa-file-alt" style="font-size:10px"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="sidebar-module-content">
+                                        <div class="sidebar-module-title">{{ mod.title }}</div>
+                                        <div class="sidebar-module-duration">{{ mod.duration_in_minutes|format_duration }}</div>
+                                    </div>
+                                    <div class="sidebar-module-status {% if user_progress|get_item:mod.id %}completed{% elif mod.id == module.id %}current{% else %}locked{% endif %}">
+                                        {% if user_progress|get_item:mod.id %}
+                                            <i class="fas fa-check" style="font-size:8px"></i>
+                                        {% elif mod.id == module.id %}
+                                            <i class="fas fa-circle" style="font-size:6px"></i>
+                                        {% else %}
+                                            <i class="fas fa-lock" style="font-size:8px"></i>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    /* ═══ QUIZ SLIDER ═══ */
+    let currentQuestionIndex = 0;
+    const quizSlider = document.getElementById('quizSlider');
+    const prevBtn    = document.getElementById('prevQuestionBtn');
+    const nextBtn    = document.getElementById('nextQuestionBtn');
+    const quizDots   = document.querySelectorAll('.quiz-dot');
+    const currentQuestionNum = document.getElementById('currentQuestionNum');
+    const quizSlides = document.querySelectorAll('.quiz-slide');
+    const totalQuestions = quizSlides.length;
+
+    if (quizSlider && totalQuestions > 0) {
+        function updateSlider() {
+            quizSlider.style.transform = `translateX(-${currentQuestionIndex * 100}%)`;
+            if (currentQuestionNum) currentQuestionNum.textContent = currentQuestionIndex + 1;
+            quizDots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentQuestionIndex);
+            });
+            if (prevBtn) prevBtn.disabled = currentQuestionIndex === 0;
+            if (nextBtn) {
+                nextBtn.innerHTML = currentQuestionIndex === totalQuestions - 1
+                    ? 'Finish <i class="fas fa-check"></i>'
+                    : 'Next <i class="fas fa-chevron-right"></i>';
+            }
+        }
+        if (prevBtn) prevBtn.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) { currentQuestionIndex--; updateSlider(); }
+        });
+        if (nextBtn) nextBtn.addEventListener('click', () => {
+            if (currentQuestionIndex < totalQuestions - 1) { currentQuestionIndex++; updateSlider(); }
+            else submitQuiz();
+        });
+        quizDots.forEach((dot, i) => dot.addEventListener('click', () => { currentQuestionIndex = i; updateSlider(); }));
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const slide = this.closest('.quiz-slide');
+                if (slide) {
+                    const idx = parseInt(slide.getAttribute('data-question-index'));
+                    if (quizDots[idx]) quizDots[idx].classList.add('answered');
+                }
+            });
+        });
+        updateSlider();
+    }
+
+    /* ═══ QUIZ SUBMIT ═══ */
+    function submitQuiz() {
+        const quizForm = document.getElementById('quizForm');
+        if (!quizForm) return;
+        const questions = document.querySelectorAll('.quiz-question-card');
+        let unanswered = [];
+        questions.forEach((q, i) => {
+            if (!q.querySelector('input[type="radio"]:checked')) unanswered.push(i + 1);
+        });
+        if (unanswered.length) {
+            showToast(`Please answer all questions. Unanswered: ${unanswered.join(', ')}`, 'warning');
+            currentQuestionIndex = unanswered[0] - 1;
+            if (quizSlider) quizSlider.style.transform = `translateX(-${currentQuestionIndex * 100}%)`;
+            return;
+        }
+        if (confirm('Submit your quiz? You cannot change answers after submission.')) {
+            showLoading(); quizForm.submit();
+        }
+    }
+    const submitQuizBtn = document.getElementById('submitQuizBtn');
+    if (submitQuizBtn) submitQuizBtn.addEventListener('click', submitQuiz);
+
+    /* ═══ TAB SWITCHING ═══ */
+    document.querySelectorAll('.section-tab').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.section-tab').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.section-tab-content').forEach(c => c.classList.remove('active'));
+            this.classList.add('active');
+            const tab = document.getElementById(this.getAttribute('data-tab') + 'Tab');
+            if (tab) tab.classList.add('active');
+        });
+    });
+
+    /* ═══ NOTES ═══ */
+    const notesEditor = document.getElementById('notesEditor');
+    const saveNotesBtn  = document.getElementById('saveNotesBtn');
+    const clearNotesBtn = document.getElementById('clearNotesBtn');
+    const storageKey = `notes_module_{{ module.id }}`;
+    if (notesEditor) {
+        const saved = localStorage.getItem(storageKey);
+        if (saved) notesEditor.value = saved;
+    }
+    if (saveNotesBtn) saveNotesBtn.addEventListener('click', () => {
+        localStorage.setItem(storageKey, notesEditor.value);
+        showToast('Notes saved!', 'success');
+    });
+    if (clearNotesBtn) clearNotesBtn.addEventListener('click', () => {
+        if (confirm('Clear your notes?')) {
+            notesEditor.value = '';
+            localStorage.removeItem(storageKey);
+            showToast('Notes cleared.', 'info');
+        }
+    });
+
+    /* ═══ MARK LESSON COMPLETE ═══ */
+    const markCompleteBtn = document.getElementById('markCompleteBtn');
+    if (markCompleteBtn) {
+        markCompleteBtn.addEventListener('click', function() {
+            showLoading();
+            fetch("{% url 'mark_lesson_completed' module.id %}", {
+                method: 'POST',
+                headers: { 'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json' },
+                body: JSON.stringify({})
+            })
+            .then(r => r.json())
+            .then(data => {
+                hideLoading();
+                if (data.status === 'success') {
+                    if (data.certificate_created && data.certificate_url) {
+                        showToast(`Congratulations! Certificate ready. <a href="${data.certificate_url}" style="color:#fff;text-decoration:underline;font-weight:700">View Certificate</a>`, 'success', 8000);
+                    } else {
+                        showToast(`Lesson complete! Progress: ${data.completion_percentage}%`, 'success');
+                    }
+                    setTimeout(() => {
+                        {% if next_module %}
+                            window.location.href = "{% url 'lesson_detail' course.id next_module.id %}";
+                        {% else %}
+                            window.location.href = "{% url 'course_detail' course.id %}";
+                        {% endif %}
+                    }, data.certificate_created ? 3000 : 1500);
+                } else {
+                    showToast('Error marking lesson complete', 'error');
+                }
+            })
+            .catch(() => { hideLoading(); showToast('An error occurred', 'error'); });
+        });
+    }
+
+    /* ═══ ASSIGNMENT FILE UPLOAD ═══ */
+    const fileUploadArea    = document.getElementById('fileUploadArea');
+    const submissionFile    = document.getElementById('submissionFile');
+    const selectedFileDisp  = document.getElementById('selectedFileDisplay');
+    const selectedFileName  = document.getElementById('selectedFileName');
+    const removeFileBtn     = document.getElementById('removeFileBtn');
+    const submitAssignBtn   = document.getElementById('submitAssignmentBtn');
+    const assignmentForm    = document.getElementById('assignmentForm');
+
+    if (fileUploadArea && submissionFile) {
+        fileUploadArea.addEventListener('click', () => submissionFile.click());
+        submissionFile.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                const file = this.files[0];
+                if (file.size > 10 * 1024 * 1024) {
+                    showToast('File must be under 10 MB', 'error'); this.value = ''; return;
+                }
+                selectedFileName.textContent = file.name;
+                selectedFileDisp.style.display = 'block';
+                fileUploadArea.style.display = 'none';
+            }
+        });
+        if (removeFileBtn) removeFileBtn.addEventListener('click', () => {
+            submissionFile.value = '';
+            selectedFileDisp.style.display = 'none';
+            fileUploadArea.style.display = 'block';
+        });
+        fileUploadArea.addEventListener('dragover',  e => { e.preventDefault(); fileUploadArea.classList.add('drag-over'); });
+        fileUploadArea.addEventListener('dragleave', () => fileUploadArea.classList.remove('drag-over'));
+        fileUploadArea.addEventListener('drop', e => {
+            e.preventDefault(); fileUploadArea.classList.remove('drag-over');
+            if (e.dataTransfer.files.length > 0) {
+                submissionFile.files = e.dataTransfer.files;
+                submissionFile.dispatchEvent(new Event('change'));
+            }
+        });
+    }
+    if (submitAssignBtn && assignmentForm) {
+        submitAssignBtn.addEventListener('click', () => {
+            const file = document.getElementById('submissionFile');
+            const text = document.getElementById('submissionText');
+            if (!file.files.length && !text.value.trim()) {
+                showToast('Provide a file or text submission', 'warning'); return;
+            }
+            if (confirm('Submit your assignment?')) { showLoading(); assignmentForm.submit(); }
+        });
+    }
+
+    /* ═══ UTILS ═══ */
+    function showLoading()  { document.getElementById('loadingOverlay')?.classList.add('active'); }
+    function hideLoading()  { document.getElementById('loadingOverlay')?.classList.remove('active'); }
+
+    function showToast(message, type = 'info', duration = 3000) {
+        const colors = { success:'#16a34a', error:'#dc2626', warning:'#b45309', info:'#4f46e5' };
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position:fixed;top:20px;right:20px;
+            background:${colors[type]||colors.info};
+            color:#fff;padding:12px 18px;border-radius:6px;
+            box-shadow:0 4px 12px rgba(0,0,0,0.15);
+            z-index:10000;animation:slideIn 0.3s ease-out;
+            font-weight:600;font-size:13px;max-width:380px;line-height:1.5;
+        `;
+        toast.innerHTML = message;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.style.animation = 'slideOut 0.3s ease-out';
+            setTimeout(() => toast.remove(), 300);
+        }, duration);
+    }
+
+    /* CSS for toast animations */
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn { from{transform:translateX(400px);opacity:0} to{transform:translateX(0);opacity:1} }
+        @keyframes slideOut { from{transform:translateX(0);opacity:1} to{transform:translateX(400px);opacity:0} }
+    `;
+    document.head.appendChild(style);
+
+    /* ═══ INIT S3 VIDEO PLAYER ═══ */
+    if (typeof jQuery !== 'undefined') initializeS3VideoPlayer();
+});
+
+/* S3 video helpers */
+function initializeS3VideoPlayer() {
+    if (typeof jQuery === 'undefined') return;
+    jQuery(document).on('click', '.s3-video-trigger', function(e) {
+        e.preventDefault(); openS3VideoModal(jQuery(this).attr('href'));
+    });
+}
+function openS3VideoModal(url) {
+    if (typeof jQuery === 'undefined') return;
+    if (!jQuery('#s3-video-modal').length) {
+        jQuery('body').append(`
+            <div id="s3-video-modal" class="s3-video-modal">
+                <div class="s3-video-backdrop"></div>
+                <div class="s3-video-content">
+                    <button class="s3-video-close">&times;</button>
+                    <video controls autoplay preload="metadata">
+                        <source src="" type="video/mp4">
+                    </video>
+                </div>
+            </div>`);
+        jQuery('#s3-video-modal .s3-video-close, #s3-video-modal .s3-video-backdrop').on('click', closeS3VideoModal);
+        jQuery(document).on('keydown', e => { if (e.key === 'Escape') closeS3VideoModal(); });
+    }
+    jQuery('#s3-video-modal video source').attr('src', url);
+    jQuery('#s3-video-modal video')[0].load();
+    jQuery('#s3-video-modal').fadeIn(200);
+    jQuery('body').addClass('modal-open');
+}
+function closeS3VideoModal() {
+    if (typeof jQuery === 'undefined') return;
+    const v = jQuery('#s3-video-modal video')[0];
+    if (v) { v.pause(); v.currentTime = 0; }
+    jQuery('#s3-video-modal').fadeOut(200);
+    jQuery('body').removeClass('modal-open');
+}
+</script>
+
+{% endblock %}
